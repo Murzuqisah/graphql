@@ -4,7 +4,7 @@ let logout
 let generateSelectedGraph
 let loadProfileData
 
-export const renderLoginPage = (root) => {
+export const renderLoginPage = () => {
     const app = document.getElementById('app');
 
     const loginContainer = document.createElement('div');
