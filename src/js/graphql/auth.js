@@ -37,5 +37,18 @@ async function login(identifier, password) {
         if (data.errors) {
             throw new Error(data.errors[0].message || 'Invalid credentials')
         }
+
+        if (data.data && data.data.login && data.data.login.token) {
+            localStorage.setItem('jwt', data.data.login.token)
+
+            localStorage.setItem('user', JSON.stringify(data.data.login.user))
+
+            return true
+        } else {
+            throw new Error('Login failed')
+        }
+    } catch (error) {
+        console.log("Login error:", error)
+        throw new Error(error.message || "Login failed. Please try again.")
     }
 }
