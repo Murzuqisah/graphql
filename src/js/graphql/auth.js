@@ -1,11 +1,27 @@
-const API_ENDPOINT = 'https://learn.zone01kisumu.ke/api/graphql-engine/v1/graphql';
+import { config } from '../config';
 
-const isAuthenticated = () => {
-    return localStorage.getItem('jwt') !== null
-}
+export const isAuthenticated = () => {
+
+    const token = localStorage.getItem(config.jwtKey);
+    if (!token) return false;
+
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+        
+        if (payload.exp && payload.exp < currentTime) {
+            logout();
+            return false;
+        }
+        return true;
+    } catch (error) {
+        logout();
+        return false;
+    }
+};
 
 // login functionality
-async function login(identifier, password) {
+export async function login(identifier, password) {
     const isEmail = identifier.includes('@')
 
     const query = `
