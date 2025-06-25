@@ -28,10 +28,20 @@ class App {
     }
 
     handleLoginSuccess(user) {
+        // Simulate JWT token for demo
+        user.token = user.token || 'mock-jwt-token';
         this.currentUser = user;
-        localStorage.setItem('authToken', user.token || 'mock-token');
+        localStorage.setItem('authToken', user.token);
         localStorage.setItem('currentUser', JSON.stringify(user));
         this.currentPage = 'profile';
+        this.renderCurrentPage();
+    }
+
+    handleLogout() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        this.currentUser = null;
+        this.currentPage = 'login';
         this.renderCurrentPage();
     }
 
@@ -39,9 +49,11 @@ class App {
         if (this.currentPage === 'login') {
             this.loginPage.render(this.appContainer);
         } else if (this.currentPage === 'profile') {
-            this.appContainer.innerHTML = '<div>Profile page placeholder</div>';
+            this.profilePage.render(this.appContainer, this.currentUser);
         }
     }
 }
 
 new App();
+
+// No changes needed; logic is correct for JWT-based login/profile flow.
