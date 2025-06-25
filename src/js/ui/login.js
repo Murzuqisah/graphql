@@ -1,105 +1,154 @@
-let login
-let navigateTo
-let logout
-let generateSelectedGraph
-let loadProfileData
+import { DOMUtils } from '../controller.js';
 
-export const renderLoginPage = () => {
-    const app = document.getElementById('app');
+const AUTH_API = "https://learn.zone01kisumu.ke/api/auth/signin";
 
-    const loginContainer = document.createElement('div');
-    loginContainer.className = 'login-container';
+class LoginPage {
+  constructor(appController) {
+    this.appController = appController;
+  }
 
-    const loginCard = document.createElement('div');
-    loginCard.className = 'login-card';
+  render(container) {
+    container.innerHTML = '';
 
-    const title = document.createElement('div');
-    title.textContent = 'Login';
+    const pageContainer = DOMUtils.createElement('div', 'container fade-in');
+    const title = DOMUtils.createElement('h1', '', 'Welcome Back');
+    const form = this.createForm();
 
-    const errorMessage = document.createElement("div")
-  errorMessage.id = "error-message"
-  errorMessage.className = "error-message"
+    pageContainer.appendChild(title);
+    pageContainer.appendChild(form);
+    container.appendChild(pageContainer);
 
-  // Create form
-  const form = document.createElement("form")
-  form.id = "login-form"
+    this.attachEventListeners();
 
-  // Create identifier input group
-  const identifierGroup = document.createElement("div")
-  identifierGroup.className = "form-group"
+    setTimeout(() => document.getElementById('username').focus(), 100);
+  }
 
-  const identifierLabel = document.createElement("label")
-  identifierLabel.setAttribute("for", "identifier")
-  identifierLabel.textContent = "Username or Email"
+  createForm() {
+    const form = DOMUtils.createElement('form');
+    form.id = 'loginForm';
 
-  const identifierInput = document.createElement("input")
-  identifierInput.type = "text"
-  identifierInput.id = "identifier"
-  identifierInput.name = "identifier"
-  identifierInput.required = true
+    // Create form fields
+    const usernameInput = DOMUtils.createInput('text', 'username', 'Enter your username or email', true);
+    const passwordInput = DOMUtils.createInput('password', 'password', 'Enter your password', true);
 
-  identifierGroup.appendChild(identifierLabel)
-  identifierGroup.appendChild(identifierInput)
+    const usernameGroup = DOMUtils.createFormGroup('Username or Email', usernameInput, 'username-error');
+    const passwordGroup = DOMUtils.createFormGroup('Password', passwordInput, 'password-error');
 
-  // Create password input group
-  const passwordGroup = document.createElement("div")
-  passwordGroup.className = "form-group"
+    const submitButton = DOMUtils.createElement('button', '', 'Sign In');
+    submitButton.type = 'submit';
 
-  const passwordLabel = document.createElement("label")
-  passwordLabel.setAttribute("for", "password")
-  passwordLabel.textContent = "Password"
+    const generalError = DOMUtils.createElement('div', 'error-message');
+    generalError.id = 'general-error';
+    generalError.style.textAlign = 'center';
+    generalError.style.marginTop = '1rem';
 
-  const passwordInput = document.createElement("input")
-  passwordInput.type = "password"
-  passwordInput.id = "password"
-  passwordInput.name = "password"
-  passwordInput.required = true
+    form.appendChild(usernameGroup);
+    form.appendChild(passwordGroup);
+    form.appendChild(submitButton);
+    form.appendChild(generalError);
 
-  passwordGroup.appendChild(passwordLabel)
-  passwordGroup.appendChild(passwordInput)
+    return form;
+  }
 
-  // Create submit button
-  const submitButton = document.createElement("button")
-  submitButton.type = "submit"
-  submitButton.className = "btn-primary"
-  submitButton.textContent = "Login"
+  attachEventListeners() {
+    const form = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
 
-  // Assemble form
-  form.appendChild(identifierGroup)
-  form.appendChild(passwordGroup)
-  form.appendChild(submitButton)
+    usernameInput.addEventListener('input', () => this.validateField('username'));
+    passwordInput.addEventListener('input', () => this.validateField('password'));
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleLogin();
+    });
+  }
 
-  // Assemble login card
-  loginCard.appendChild(title)
-  loginCard.appendChild(errorMessage)
-  loginCard.appendChild(form)
+  validateField(fieldName) {
+    const field = document.getElementById(fieldName);
+    const value = field.value.trim();
 
-  // Assemble login container
-  loginContainer.appendChild(loginCard)
+    field.classList.remove('error');
+    document.getElementById(`${fieldName}-error`).classList.remove('show');
 
-  // Replace app content
-  app.innerHTML = ""
-  app.appendChild(loginContainer)
+    if (!value) {
+      DOMUtils.showError(fieldName, `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`);
+      return false;
+    }
 
-  // Add event listener for form submission
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault()
+    if (fieldName === 'username' && value.length < 3) {
+      DOMUtils.showError(fieldName, 'Username must be at least 3 characters long');
+      return false;
+    }
 
-    const identifier = document.getElementById("identifier").value
-    const password = document.getElementById("password").value
+    if (fieldName === 'password' && value.length < 6) {
+      DOMUtils.showError(fieldName, 'Password must be at least 6 characters long');
+      return false;
+    }
+
+    return true;
+  }
+
+  showGeneralError(message) {
+    const errorElement = document.getElementById('general-error');
+    errorElement.textContent = message;
+    errorElement.classList.add('show');
+  }
+
+  async handleLogin() {
+    console.log('Handling login attempt');
+
+    DOMUtils.hideErrors();
+
+    const identifier = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const submitButton = document.querySelector('button[type="submit"]');
+
+    const isUsernameValid = this.validateField('username');
+    const isPasswordValid = this.validateField('password');
+
+    if (!isUsernameValid || !isPasswordValid) {
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = 'Signing In...';
 
     try {
-      errorMessage.textContent = ""
-      errorMessage.style.display = "none"
+      // Use HTTP Basic Auth with base64 encoding
+      const credentials = btoa(`${identifier}:${password}`);
+      const response = await fetch(AUTH_API, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${credentials}`,
+        }
+      });
 
-      const success = await login(identifier, password)
-
-      if (success) {
-        navigateTo("/profile")
+      if (!response.ok) {
+        throw new Error('Invalid username/email or password.');
       }
+
+      // The response is a plain JWT string, not JSON
+      const token = await response.text();
+
+      // Decode JWT payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userData = {
+        username: payload.username || identifier,
+        email: payload.email || (identifier.includes('@') ? identifier : ''),
+        loginTime: new Date().toISOString(),
+        token
+      };
+
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+
+      this.appController.handleLoginSuccess(userData);
     } catch (error) {
-      errorMessage.textContent = error.message
-      errorMessage.style.display = "block"
+      this.showGeneralError(error.message || 'Login failed. Please try again.');
+      submitButton.disabled = false;
+      submitButton.textContent = 'Sign In';
     }
-  })
+  }
 }
+
+export { LoginPage };
