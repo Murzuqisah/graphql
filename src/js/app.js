@@ -1,5 +1,5 @@
 import { LoginPage } from './ui/login.js';
-// import { ProfilePage } from './ui/profile.js'; // Uncomment and implement as needed
+import { ProfilePage } from './ui/profile.js';
 
 class App {
     constructor() {
@@ -8,7 +8,7 @@ class App {
         this.appContainer = null;
 
         this.loginPage = new LoginPage(this);
-        // this.profilePage = new ProfilePage(this); // Uncomment and implement as needed
+        this.profilePage = new ProfilePage(this);
 
         document.addEventListener('DOMContentLoaded', () => {
             this.appContainer = document.getElementById('app');
@@ -39,8 +39,7 @@ class App {
         if (this.currentPage === 'login') {
             this.loginPage.render(this.appContainer);
         } else if (this.currentPage === 'profile') {
-            // this.profilePage.render(this.appContainer, this.currentUser); // Uncomment and implement as needed
-            this.appContainer.innerHTML = '<div>Profile page placeholder</div>'; // Temporary placeholder
+            this.appContainer.innerHTML = '<div>Profile page placeholder</div>';
         }
     }
 }
