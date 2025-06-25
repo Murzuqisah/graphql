@@ -1,3 +1,5 @@
+import { DOMUtils } from '../controller.js';
+
 class LoginPage {
   constructor(appController) {
     this.appController = appController;
