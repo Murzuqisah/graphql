@@ -32,6 +32,17 @@ class DOMUtils {
         return group;
     }
 
+    static showError(fieldName, message) {
+        const field = document.getElementById(fieldName);
+        const errorElement = document.getElementById(`${fieldName}-error`);
+
+        if (field && errorElement) {
+            field.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+    }
+
     
 }
 
