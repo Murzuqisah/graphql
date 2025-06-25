@@ -1,5 +1,7 @@
 import { DOMUtils } from '../controller.js';
 
+const AUTH_API = "https://learn.zone01kisumu.ke/api/auth/signin";
+
 class LoginPage {
   constructor(appController) {
     this.appController = appController;
@@ -92,12 +94,12 @@ class LoginPage {
     errorElement.classList.add('show');
   }
 
-  handleLogin() {
+  async handleLogin() {
     console.log('Handling login attempt');
 
     DOMUtils.hideErrors();
 
-    const username = document.getElementById('username').value.trim();
+    const identifier = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     const submitButton = document.querySelector('button[type="submit"]');
 
@@ -111,24 +113,41 @@ class LoginPage {
     submitButton.disabled = true;
     submitButton.textContent = 'Signing In...';
 
-    setTimeout(() => {
-      if (username === this.validCredentials.username && password === this.validCredentials.password) {
-        const userData = {
-          username: username,
-          email: username.includes('@') ? username : `${username}@example.com`,
-          loginTime: new Date().toISOString()
-        };
+    try {
+      // Use HTTP Basic Auth with base64 encoding
+      const credentials = btoa(`${identifier}:${password}`);
+      const response = await fetch(AUTH_API, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${credentials}`,
+        }
+      });
 
-        console.log('Login successful', userData);
-        this.appController.handleLoginSuccess(userData);
-      } else {
-        console.log('Login failed - invalid credentials');
-        this.showGeneralError('Invalid username or password.');
-
-        submitButton.disabled = false;
-        submitButton.textContent = 'Sign In';
+      if (!response.ok) {
+        throw new Error('Invalid username/email or password.');
       }
-    }, 1000);
+
+      // The response is a plain JWT string, not JSON
+      const token = await response.text();
+
+      // Decode JWT payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userData = {
+        username: payload.username || identifier,
+        email: payload.email || (identifier.includes('@') ? identifier : ''),
+        loginTime: new Date().toISOString(),
+        token
+      };
+
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+
+      this.appController.handleLoginSuccess(userData);
+    } catch (error) {
+      this.showGeneralError(error.message || 'Login failed. Please try again.');
+      submitButton.disabled = false;
+      submitButton.textContent = 'Sign In';
+    }
   }
 }
 
