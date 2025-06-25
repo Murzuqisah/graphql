@@ -16,6 +16,22 @@ class DOMUtils {
         return input;
     }
 
+    static createFormGroup(labelText, input, errorId) {
+        const group = this.createElement('div', 'form-group');
+
+        const label = this.createElement('label', '', labelText);
+        label.setAttribute('for', input.id);
+
+        const errorDiv = this.createElement('div', 'error-message');
+        errorDiv.id = errorId;
+
+        group.appendChild(label);
+        group.appendChild(input);
+        group.appendChild(errorDiv);
+
+        return group;
+    }
+
     
 }
 
