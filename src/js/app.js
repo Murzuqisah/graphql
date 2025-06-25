@@ -4,11 +4,16 @@ class App {
         this.currentPage = 'login';
         this.appContainer = null;
 
-        this.loginPage = new this.loginPage(this);
-
         this.init();
     }
 
     init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.appContainer = document.getElementById('app');
+            this.renderPage();
+        });
+    }
+
+    renderPage() {
     }
 }
