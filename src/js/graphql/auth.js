@@ -1,8 +1,8 @@
-import { config } from '../config';
+let token = localStorage.getItem('authToken');
+let currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 export const isAuthenticated = () => {
 
-    const token = localStorage.getItem(config.jwtKey);
     if (!token) return false;
 
     try {
