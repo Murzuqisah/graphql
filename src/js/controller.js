@@ -43,7 +43,13 @@ class DOMUtils {
         }
     }
 
-    
+    static hideErrors() {
+        const errorElements = document.querySelectorAll('.error-message');
+        const inputElements = document.querySelectorAll('input');
+
+        errorElements.forEach(el => el.classList.remove('show'));
+        inputElements.forEach(el => el.classList.remove('error'));
+    }
 }
 
 export { DOMUtils };
