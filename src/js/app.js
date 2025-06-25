@@ -10,10 +10,15 @@ class App {
     init() {
         document.addEventListener('DOMContentLoaded', () => {
             this.appContainer = document.getElementById('app');
-            this.renderPage();
+            this.renderCurrentPage();
         });
     }
 
-    renderPage() {
+    renderCurrentPage() {
+        if (this.currentPage === 'login') {
+            this.LoginPage.render(this.appContainer);
+        }
     }
 }
+
+new App();
