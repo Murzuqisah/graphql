@@ -33,4 +33,16 @@ export class AuthManager {
             return false;
         }
     }
+
+    static getUserIdFromToken() {
+        const token = this.getAuthToken();
+        if (!token) return null;
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.userId || null;
+        } catch {
+            return null;
+        }
+    }
 }
