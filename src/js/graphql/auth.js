@@ -8,4 +8,11 @@ export class AuthManager {
     static getAuthToken() {
         return localStorage.getItem(this.AUTH_TOKEN_KEY);
     }
+
+    static removeAuthToken() {
+        localStorage.removeItem(this.AUTH_TOKEN_KEY);
+        localStorage.removeItem('currentUser');
+    }
+
+    
 }
