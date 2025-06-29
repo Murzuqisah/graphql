@@ -155,7 +155,7 @@ export class Client {
           downTransactions: result.downTransactions || [],
           auditsRatio: auditsRatio,
           auditsDoneAmount: auditsDoneAmount,
-          auditsReceivedAmount: auditsReceivedAmount,          
-        }
+          auditsReceivedAmount: auditsReceivedAmount,
+        };
     }
 }
