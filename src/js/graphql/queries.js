@@ -135,5 +135,27 @@ export class Client {
                 }
             }
         `;
-  }
+      const result = await this.query(query, { userId });
+      if (!result || !result.user || result.user.length === 0) {
+          throw new Error("User not found or no data available.");
+      }
+
+      const auditsDoneAmount = result.upTransactions?.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+      const auditsReceivedAmount = result.downTransactions?.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+
+      const auditsRatio = auditsReceivedAmount > 0 ? auditsDoneAmount / auditsReceivedAmount : 0;
+
+      return {
+          user: result.user,
+          transaction: result.transaction,
+          progress: result.progress,
+          result: result.result,
+          skill: result.skill || [],
+          upTransactions: result.upTransactions || [],
+          downTransactions: result.downTransactions || [],
+          auditsRatio: auditsRatio,
+          auditsDoneAmount: auditsDoneAmount,
+          auditsReceivedAmount: auditsReceivedAmount,          
+        }
+    }
 }
