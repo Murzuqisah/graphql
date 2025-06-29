@@ -12,13 +12,23 @@ class App {
 
         document.addEventListener('DOMContentLoaded', () => {
             this.appContainer = document.getElementById('app');
-            this.checkExistingSession();
+            this.setupRouting();
         });
     }
 
-    checkExistingSession() {
-        const token = localStorage.getItem('authToken');
-        if (token) {
+    setupRouting() {
+        window.addEventListener('hashchange', () => this.handleRouteChange());
+        this.handleRouteChange();
+    }
+
+    handleRouteChange() {
+        const hash = location.hash.replace(/^#\/?/, '').split('/')[0];
+        if (hash === 'profile') {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                this.navigateTo('login');
+                return;
+            }
             this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
             this.currentPage = 'profile';
         } else {
@@ -27,25 +37,27 @@ class App {
         this.renderCurrentPage();
     }
 
+    navigateTo(page) {
+        location.hash = `#/${page}`;
+    }
+
     handleLoginSuccess(user) {
-        // Simulate JWT token for demo
-        user.token = user.token || 'mock-jwt-token';
         this.currentUser = user;
         localStorage.setItem('authToken', user.token);
         localStorage.setItem('currentUser', JSON.stringify(user));
-        this.currentPage = 'profile';
-        this.renderCurrentPage();
+        this.navigateTo('profile');
     }
 
     handleLogout() {
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
         this.currentUser = null;
-        this.currentPage = 'login';
-        this.renderCurrentPage();
+        this.navigateTo('login');
     }
 
     renderCurrentPage() {
+        if (!this.appContainer) return;
+        this.appContainer.innerHTML = '';
         if (this.currentPage === 'login') {
             this.loginPage.render(this.appContainer);
         } else if (this.currentPage === 'profile') {
@@ -55,5 +67,4 @@ class App {
 }
 
 new App();
-
-// No changes needed; logic is correct for JWT-based login/profile flow.
+// Only app.js should control routing and rendering.
