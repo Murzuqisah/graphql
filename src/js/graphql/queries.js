@@ -17,5 +17,12 @@ export class Client {
             },
             body: JSON.stringify({ query, variables }),
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
     }
 }
