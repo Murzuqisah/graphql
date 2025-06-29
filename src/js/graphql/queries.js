@@ -23,6 +23,9 @@ export class Client {
         }
 
         const result = await response.json();
-
+        if (result.errors) {
+            throw new Error(`GraphQL error: ${result.errors.map(e => e.message).join(', ')}`);
+        }
+        return result.data;
     }
 }
