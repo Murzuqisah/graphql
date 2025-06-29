@@ -27,4 +27,10 @@ export class Router {
             componentInstance.show(this.container);
         }
     }
+
+    getCurrentRoute() {
+        return this.currentRoute;
+    }
 }
+
+export const router = new Router();
