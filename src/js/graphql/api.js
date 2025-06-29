@@ -23,5 +23,11 @@ export class ApiClient {
         } else {
             token = await response.text();
         }
+
+        if (!token || typeof token !== 'string' || token.trim() === '') {
+            throw new Error("Invalid token received from server.");
+        }
+
+        return token;
     }
 }
