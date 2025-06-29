@@ -14,5 +14,23 @@ export class AuthManager {
         localStorage.removeItem('currentUser');
     }
 
-    
+    static isAuthenticated() {
+        const token = this.getAuthToken();
+        if (!token) return false;
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (!payload) return false;
+
+            const currentTime = Date.now() / 1000;
+            if (payload.exp && payload.exp < currentTime) {
+                this.removeAuthToken();
+                return false;
+            }
+            return true;
+        } catch {
+            this.removeAuthToken();
+            return false;
+        }
+    }
 }
