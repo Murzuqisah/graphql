@@ -15,7 +15,7 @@ export class XPProgressChart {
             return {
                 date: new Date(transaction.createdAt),
                 xp: cumulativeXP,
-                project: transaction.object.name,
+                project: transaction.object?.name || 'Unknown Project',
                 amount: transaction.amount,
                 index,
             };

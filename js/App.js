@@ -6,7 +6,6 @@ import { XPProgressPage } from './pages/XPProgressPage.js';
 import { ProjectsPage } from './pages/ProjectsPage.js';
 import { AuditsPage } from './pages/AuditsPage.js';
 import { SkillsPage } from './pages/SkillsPage.js';
-import { StatsPage } from './pages/StatsPage.js';
 
 export class App {
     constructor() {
@@ -79,10 +78,6 @@ export class App {
             case 'dashboard':
                 const profile = new Profile(() => this.handleLogout(), this.userData);
                 profile.show(this.container);
-                break;
-            case 'stats':
-                const statsPage = new StatsPage(() => this.handleLogout(), this.userData);
-                statsPage.show(this.container);
                 break;
             case 'xp-progress':
                 const xpPage = new XPProgressPage(() => this.handleLogout(), this.userData);

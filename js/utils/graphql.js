@@ -45,6 +45,7 @@ export class GraphQLClient {
                     campus
                     createdAt
                     updatedAt
+                    auditRatio
                     events(where: { eventId: { _eq: 75 } }) {
                         level
                     }
@@ -116,6 +117,18 @@ export class GraphQLClient {
                     amount
                 }
                 
+                # Skill types aggregate for better performance
+                skillTypes: transaction_aggregate(
+                    distinct_on: [type]
+                    where: {userId: {_eq: $userId}, type: {_nin: ["xp", "level", "up", "down"]}, eventId: {_eq: 75}}
+                    order_by: [{type: asc}, {amount: desc}]
+                ) {
+                    nodes {
+                        type
+                        amount
+                    }
+                }
+                
                 # Up transactions (audits done) for event 75 only
                 upTransactions: transaction(
                     where: {userId: {_eq: $userId}, type: {_eq: "up"}, eventId: {_eq: 75}}
@@ -152,10 +165,14 @@ export class GraphQLClient {
 
         const result = await this.executeQuery(query, { userId });
         
-        // Calculate audit ratio: audits-received / audits-done
+        // Get audit ratio directly from user object (already calculated by GraphQL API)
+        const auditRatio = result.user[0]?.auditRatio || 0;
         const auditsDone = result.audit_done?.length || 0;
         const auditsReceived = result.audit_received?.length || 0;
-        const auditRatio = auditsDone > 0 ? auditsReceived / auditsDone : 0;
+        
+        // Also calculate from up/down transactions for chart display
+        const upTransactionTotal = result.upTransactions?.reduce((sum, t) => sum + t.amount, 0) || 0;
+        const downTransactionTotal = result.downTransactions?.reduce((sum, t) => sum + t.amount, 0) || 0;
         
         return {
             user: result.user,
@@ -163,11 +180,14 @@ export class GraphQLClient {
             progress: result.progress,
             result: result.result,
             skill: result.skill || [],
+            skillTypes: result.skillTypes?.nodes || [],
             upTransactions: result.upTransactions || [],
             downTransactions: result.downTransactions || [],
             auditRatio: auditRatio,
             auditsDone: auditsDone,
             auditsReceived: auditsReceived,
+            upTransactionTotal: upTransactionTotal,
+            downTransactionTotal: downTransactionTotal,
         };
     }
 }
