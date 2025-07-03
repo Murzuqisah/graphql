@@ -5,8 +5,23 @@ export class ProjectsChart {
     }
 
     processData() {
-        const passed = this.progress.filter(p => p.grade >= 1).length;
-        const failed = this.progress.filter(p => p.grade < 1).length;
+        // Filter for completed projects only and count unique projects
+        const completedProjects = this.progress.filter(p => p.isDone && p.object && p.object.type === "project");
+        
+        // Use Set to count unique projects to avoid counting redone projects
+        const passedProjectIds = new Set(
+            completedProjects
+                .filter(p => p.grade >= 1)
+                .map(p => p.object.id)
+        );
+        const failedProjectIds = new Set(
+            completedProjects
+                .filter(p => p.grade < 1)
+                .map(p => p.object.id)
+        );
+        
+        const passed = passedProjectIds.size;
+        const failed = failedProjectIds.size;
         const total = passed + failed;
 
         return {
@@ -134,25 +149,6 @@ export class ProjectsChart {
                             ></div>
                         </div>
                     </div>
-                </div>
-            </div>
-        `;
-    }
-
-    renderRecentProjects() {
-        const recentProjects = this.progress.slice(0, 5);
-        return `
-            <div>
-                <h5 class="text-sm font-semibold text-secondary-900 mb-3">Recent Projects</h5>
-                <div class="space-y-2 max-h-32 overflow-y-auto">
-                    ${recentProjects.map(project => `
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-secondary-600 truncate max-w-32">${project.object.name}</span>
-                            <span class="font-medium ${project.grade >= 1 ? 'text-green-600' : 'text-red-600'}">
-                                ${project.grade >= 1 ? 'PASS' : 'FAIL'}
-                            </span>
-                        </div>
-                    `).join('')}
                 </div>
             </div>
         `;
