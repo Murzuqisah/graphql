@@ -1,0 +1,13 @@
+{
+  "name": "graphql-student-dashboard",
+  "version": "1.0.0",
+  "description": "Zone01 Kisumu Student Dashboard - GraphQL client and server",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}
