@@ -1,7 +1,3 @@
-import { XPProgressChart } from './charts/XPProgressChart.js';
-import { ProjectsChart } from './charts/ProjectsChart.js';
-import { AuditRatioChart } from './charts/AuditRatioChart.js';
-import { SkillsChart } from './charts/SkillsChart.js';
 import { formatXPValue } from '../utils/utils.js';
 
 export class Statistics {
@@ -17,8 +13,22 @@ export class Statistics {
         
         // Filter projects for event 75 only
         const event75Progress = this.userData.progress.filter(p => p.eventId === 75 && p.object && p.object.type === "project");
-        const completedProjects = event75Progress.filter(p => p.grade >= 1 && p.isDone).length;
-        const failedProjects = event75Progress.filter(p => p.grade < 1 && p.isDone).length;
+        
+        // Use Set to count unique completed projects (avoid counting redone projects)
+        const completedProjectIds = new Set(
+            event75Progress
+                .filter(p => p.grade >= 1 && p.isDone)
+                .map(p => p.object.id)
+        );
+        const completedProjects = completedProjectIds.size;
+        
+        // Count failed projects (unique failures)
+        const failedProjectIds = new Set(
+            event75Progress
+                .filter(p => p.grade < 1 && p.isDone)
+                .map(p => p.object.id)
+        );
+        const failedProjects = failedProjectIds.size;
         
         // Use the calculated audit ratio from GraphQL
         const auditRatio = this.userData.auditRatio || 0;
@@ -125,7 +135,7 @@ export class Statistics {
                         <div>
                             <p class="text-sm font-medium text-secondary-600">Audit Ratio</p>
                             <p class="text-2xl font-bold text-purple-600">${stats.auditRatio}</p>
-                            <p class="text-xs text-secondary-500">${stats.auditsReceived} received / ${stats.auditsDone} done</p>
+                            <p class="text-xs text-secondary-500">${stats.auditsDone} done / ${stats.auditsReceived} received</p>
                         </div>
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

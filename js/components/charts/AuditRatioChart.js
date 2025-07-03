@@ -5,10 +5,12 @@ export class AuditRatioChart {
     }
 
     processData() {
-        const auditsDone = this.userData.auditsDone || 0;
-        const auditsReceived = this.userData.auditsReceived || 0;
-        // Correct calculation: audits-received / audits-done
-        const ratio = auditsDone > 0 ? auditsReceived / auditsDone : 0;
+        // Use up/down transaction totals for chart display
+        const auditsDone = this.userData.upTransactionTotal || 0;
+        const auditsReceived = this.userData.downTransactionTotal || 0;
+        
+        // Use the audit ratio from GraphQL API (already calculated correctly)
+        const ratio = this.userData.auditRatio || 0;
         
         return {
             done: auditsDone,
