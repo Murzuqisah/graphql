@@ -10,7 +10,6 @@ export class Navigation {
         
         const navItems = [
             { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-            { id: 'stats', label: 'Statistics', icon: '📊' },
             { id: 'xp-progress', label: 'XP Progress', icon: '📈' },
             { id: 'projects', label: 'Projects', icon: '📋' },
             { id: 'audits', label: 'Audits', icon: '🔍' },
