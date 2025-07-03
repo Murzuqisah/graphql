@@ -1,102 +1,125 @@
 # graphql
 
-A lightweight and modular GraphQL client built using Vanilla JavaScript — no frameworks, no dependencies. This project demonstrates how to interact with a GraphQL API using native fetch, structured queries and mutations, and a simple, responsive UI. A modern, responsive web application for Zone01 Kisumu students to track their learning progress, view statistics, and manage their academic journey.
+A lightweight and modular GraphQL client built using Vanilla JavaScript — no frameworks, no dependencies. This project aims to become a modern, responsive web application for Zone01 Kisumu students to track their learning progress, view statistics, and manage their academic journey.
 
-## Features
+## Features (Current)
 
-### Authentication
-
-- Secure login using Zone01 Kisumu credentials
-- JWT token-based authentication
-- Automatic session management
-
-### Dashboard
-
-- Overview of key metrics (XP, projects, audit ratio, current level)
-- Recent activity tracking
-- Quick statistics summary
-- Personalized greeting and progress indicators
-
-### Profile Management
-
-- User information display
-- Campus and contact details
-- Member since information
-- Profile customization
-
-### Project Tracking
-
-- Complete project history
-- Success/failure rates
-- Project completion statistics
-- Progress indicators
-- Detailed project information
-
-### Skills Analysis
-
-- Comprehensive skills breakdown
-- Skill progression tracking
-- Visual skill distribution
-- Top skills identification
-
-### Statistics & Analytics
-
-- XP progression over time
-- Audit ratio calculations
-- Performance metrics
-- Achievement tracking
+- Basic HTML5 project structure.
+- A utility-first CSS design system for consistent styling.
+- A modular JavaScript entry point for future application logic.
 
 ## Technology Stack
-
-### Frontend
 
 - **Vanilla JavaScript** - Modern ES6+ modules
 - **CSS3** - Custom utility-first styling system
 - **HTML5** - Semantic markup with templates
-- **SVG** - Custom charts and visualizations
-
-### Backend Integration
-
-- **GraphQL** - Zone01 Kisumu API integration
-- **REST API** - Authentication endpoints
-- **JWT** - Secure token management
-
-### Architecture
-
-- **Component-based** - Modular UI components
-- **Router system** - Client-side navigation
-- **State management** - Centralized data handling
-- **Responsive design** - Mobile-first approach
 
 ## Project Structure
 
 ```txt
-public/
-├── index.html                 # Main HTML file
-├── src/
-│   ├── css/
-│   │   └── styles.css         # Application styles
-│   └── js/
-│       ├── main.js            # Application entry point
-│       ├── graphql/
-│       │   ├── auth.js        # Authentication management
-│       │   └── queries.js     # GraphQL client & API calls
-│       ├── routes/
-│       │   └── route.js       # Client-side routing
-│       └── ui/
-│           ├── app.js         # Main application component
-│           ├── login.js       # Login page component
-│           ├── profile.js     # Profile page component
-│           ├── config.js      # Configuration constants
-│           ├── controller.js  # Application controller
-│           └── components/
-│               ├── LoadingSpinner.js
-│               ├── UserInfo.js
-│               ├── Sidebar.js
-│               └── Statistics.js
-├── server.js                  # Express server
-└── package.json              # Dependencies and scripts
+├── public/
+├── js/
+│ ├── components/
+│ │ ├── charts/
+│ │ │ ├── AuditRatioChart.js
+│ │ │ ├── ProjectsChart.js
+│ │ │ ├── SkillsChart.js
+│ │ │ └── XPProgressChart.js
+│ │ ├── templates/
+│ │ │ ├── LoadingTemplate.js
+│ │ │ ├── LoginTemplate.js
+│ │ │ └── ProfileTemplate.js
+│ │ └── LoadingSpinner.js
+│ ├── Login.js
+│ ├── LoginComponent.js
+│ ├── Navigation.js
+│ ├── Profile.js
+│ ├── Statistics.js
+│ ├── UserInfo.js
+│ ├── pages/
+│ │ ├── AuditsPage.js
+│ │ ├── ProjectsPage.js
+│ │ ├── SkillsPage.js
+│ │ ├── StatsPage.js
+│ │ └── XPProgressPage.js
+│ ├── utils/
+│ │ ├── api.js
+│ │ ├── auth.js
+│ │ ├── config.js
+│ │ ├── graph.js
+│ │ ├── graphql.js
+│ │ └── utils.js
+│ ├── App.js
+│ └── main.js
+├── styles/
+│ └── main.css
+├── index.html
+├── .gitignore
+├── LICENSE
+├── package-lock.json
+└── package.json        # Core application styles
+|-- server.js # Main server for the application
+└── README.md               # Project documentation
 ```
+
+## Descriptions
+
+### Charts
+
+Contains chart components visualising different metrics:
+
+- `AuditRatioChart.js`: Displays audit performance ratios.
+- `ProjectsChart.js`: Shows project contributions over time.
+- `SkillsChart.js`: Highlights skill distribution.
+- `XPProgressChart.js`: Tracks XP progress over time.
+
+### Templates
+
+Reusable HTML/JS templates:
+
+- `LoginTemplate.js`: Renders login form.
+- `ProfileTemplate.js`: Displays user profile.
+- `LoadingTemplate.js`: Generic loading UI.
+
+### Pages
+
+Dynamic views rendered depending on the route or section:
+
+- `AuditsPage.js`
+- `ProjectsPage.js`
+- `SkillsPage.js`
+- `StatsPage.js`
+- `XPProgressPage.js`
+
+### Services and helpers
+
+- `api.js`: API request functions.
+- `auth.js`: Authentication logic.
+- `config.js`: Environment/config values.
+- `graph.js` & `graphql.js`: Graph data utilities.
+- `utils.js`: Miscellaneous helpers.
+
+### Logic + UI
+
+- `App.js`: Main application entry setup.
+- `main.js`: App bootstrap logic.
+- `Login.js`, `LoginComponent.js`, `Navigation.js`, `Profile.js`, `Statistics.js`, `UserInfo.js`: Application sub-components.
+
+---
+
+## Styling
+
+All styles are located under the `styles/` directory.
+
+- `main.css`: Centralised styling file.
+
+---
+
+## Entry Point
+
+- `index.html`: Loads the application via `main.js` and binds all components.
+
+---
 
 ## Installation
 
@@ -111,7 +134,7 @@ public/
 1. Clone the repository
 
 ```bash
-git clone https://learn.zone01kisumu.ke/git/jamos/graphql
+git clone https://github.com/Murzuqisah/graphql
 cd graphql
 ```
 
