@@ -35,9 +35,45 @@ export class GraphQLClient {
         return result.data;
     }
 
-    static async getUserData(userId) {
+    static async getUserData(userId, filter = 'all', sort = 'newest') {
+        const progressConditions = {
+            userId: { _eq: userId },
+            eventId: { _eq: 75 },
+        };
+
+        switch (filter) {
+            case 'passed':
+                progressConditions.isDone = { _eq: true };
+                progressConditions.grade = { _gte: 1 };
+                break;
+            case 'failed':
+                progressConditions.isDone = { _eq: true };
+                progressConditions.grade = { _lt: 1 };
+                break;
+            case 'in-progress':
+                progressConditions.isDone = { _eq: false };
+                break;
+        }
+
+        let orderBy;
+        switch (sort) {
+            case 'oldest':
+                orderBy = { createdAt: 'asc' };
+                break;
+            case 'grade-high':
+                orderBy = { grade: 'desc' };
+                break;
+            case 'grade-low':
+                orderBy = { grade: 'asc' };
+                break;
+            case 'newest':
+            default:
+                orderBy = { createdAt: 'desc' };
+                break;
+        }
+
         const query = `
-            query GetUserData($userId: Int!) {
+            query GetUserData($userId: Int!, $progressWhere: progress_bool_exp, $progressOrderBy: [progress_order_by!]) {
                 user(where: {id: {_eq: $userId}}) {
                     id
                     login
@@ -51,7 +87,6 @@ export class GraphQLClient {
                     }
                 }
                 
-                # XP transactions for event 75 only
                 transaction(
                     where: {userId: {_eq: $userId}, type: {_eq: "xp"}, eventId: {_eq: 75}}
                     order_by: {createdAt: asc}
@@ -69,10 +104,9 @@ export class GraphQLClient {
                     }
                 }
                 
-                # Progress for event 75 only
                 progress(
-                    where: {userId: {_eq: $userId}, eventId: {_eq: 75}}
-                    order_by: {createdAt: desc}
+                    where: $progressWhere
+                    order_by: $progressOrderBy
                 ) {
                     id
                     userId
@@ -90,7 +124,6 @@ export class GraphQLClient {
                     }
                 }
                 
-                # Results for event 75 only
                 result(
                     where: {userId: {_eq: $userId}, eventId: {_eq: 75}}
                     order_by: {createdAt: desc}
@@ -109,7 +142,6 @@ export class GraphQLClient {
                     }
                 }
                 
-                # Skills transactions for event 75 only
                 skill: transaction(
                     where: {userId: {_eq: $userId}, type: {_like: "skill_%"}, eventId: {_eq: 75}}
                 ) {
@@ -117,7 +149,6 @@ export class GraphQLClient {
                     amount
                 }
                 
-                # Skill types aggregate for better performance
                 skillTypes: transaction_aggregate(
                     distinct_on: [type]
                     where: {userId: {_eq: $userId}, type: {_nin: ["xp", "level", "up", "down"]}, eventId: {_eq: 75}}
@@ -129,21 +160,18 @@ export class GraphQLClient {
                     }
                 }
                 
-                # Up transactions (audits done) for event 75 only
                 upTransactions: transaction(
                     where: {userId: {_eq: $userId}, type: {_eq: "up"}, eventId: {_eq: 75}}
                 ) {
                     amount
                 }
                 
-                # Down transactions (audits received) for event 75 only
                 downTransactions: transaction(
                     where: {userId: {_eq: $userId}, type: {_eq: "down"}, eventId: {_eq: 75}}
                 ) {
                     amount
                 }
                 
-                # Audit done count for event 75
                 audit_done: audit(
                     where: {auditorId: {_eq: $userId}, group: {eventId: {_eq: 75}}}
                 ) {
@@ -152,7 +180,6 @@ export class GraphQLClient {
                     createdAt
                 }
                 
-                # Audit received count for event 75
                 audit_received: audit(
                     where: {group: {members: {userId: {_eq: $userId}}, eventId: {_eq: 75}}}
                 ) {
@@ -163,14 +190,18 @@ export class GraphQLClient {
             }
         `;
 
-        const result = await this.executeQuery(query, { userId });
+        const variables = {
+            userId,
+            progressWhere: progressConditions,
+            progressOrderBy: orderBy,
+        };
+
+        const result = await this.executeQuery(query, variables);
         
-        // Get audit ratio directly from user object (already calculated by GraphQL API)
         const auditRatio = result.user[0]?.auditRatio || 0;
         const auditsDone = result.audit_done?.length || 0;
         const auditsReceived = result.audit_received?.length || 0;
         
-        // Also calculate from up/down transactions for chart display
         const upTransactionTotal = result.upTransactions?.reduce((sum, t) => sum + t.amount, 0) || 0;
         const downTransactionTotal = result.downTransactions?.reduce((sum, t) => sum + t.amount, 0) || 0;
         

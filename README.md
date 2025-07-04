@@ -2,7 +2,7 @@
 
 A lightweight and modular GraphQL client built using Vanilla JavaScript — no frameworks, no dependencies. This project aims to become a modern, responsive web application for Zone01 Kisumu students to track their learning progress, view statistics, and manage their academic journey.
 
-## Features (Current)
+## Features
 
 - Basic HTML5 project structure.
 - A utility-first CSS design system for consistent styling.
